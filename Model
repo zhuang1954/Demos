@@ -1,0 +1,143 @@
+using System;
+using System.Collections.Generic;
+using System.Data.SqlClient;
+using System.Linq;
+using System.Web;
+
+namespace Project1.Models.Repository
+{
+    public class UserRepository : IUserRepository
+    {
+        List<userInfo> userInfos = new List<userInfo>();
+
+        SqlConnection connection;
+        SqlCommand command;
+        SqlDataReader reader;
+       
+        int executeCount = 0;
+        string cmdString ="";
+        string conString = @"data source = HAN\SQL2019;initial catalog = Project1db; persist security info=True;user id = han; password=1qaz@wsx";
+        public UserRepository()
+        {
+            connection = new SqlConnection(conString);
+        }
+
+
+        public List<userInfo> GetUid(string uid)
+        {
+            cmdString = String.Format("SELECT * FROM userInfo WHERE uid = '${0}';",uid);
+
+               return  SearchCmd(cmdString);
+         
+        }
+        public List<userInfo> SearchUid(string uid)
+        {
+            cmdString = String.Format("SELECT * FROM userInfo WHERE uid LIKE '%{0}%';", uid);
+            return SearchCmd(cmdString);
+        }
+
+       
+
+        public List<userInfo> GetAll()
+        {
+            cmdString = "SELECT * FROM userInfo";
+            using (connection)
+            {
+                command = new SqlCommand(cmdString, connection);
+                connection.Open();
+                reader = command.ExecuteReader();
+
+                if (reader.HasRows)
+                {
+                    while (reader.Read())
+                    {
+                        userInfo GetUserInfo = ReaderInsertToList(reader);
+                        userInfos.Add(GetUserInfo);
+                    }
+                }
+                else
+                  { Console.WriteLine("沒有資料"); }
+                connection.Close();
+                reader.Close();
+                return userInfos;
+
+            }
+        }
+       
+       
+
+
+        public bool Login(string uid, string password)
+        {
+            cmdString = String.Format("SELECT uid,password,role " +
+                                      "FROM userInfo " +
+                                     "WHERE uid  = '{0}' AND password = '{1}' ;", uid, password);
+            using (connection)
+            {
+                command = new SqlCommand(cmdString, connection);
+                connection.Open();
+                reader = command.ExecuteReader();
+                connection.Close();
+                if (reader.HasRows) { return true; }
+                return false;
+            }
+        }
+
+        public bool Regist(userInfo model)
+        {
+            if (GetUid(model.uid) == null) { return false; }
+
+            cmdString = String.Format("INSERT INTO userInfo (uid,uname,password,phone,role)" +
+                                      "VALUES( '{0}', '{1}' ,'{2}','{3}','{4}');"
+                                     , model.uid, model.uname, model.password, model.phone, model.role);
+            using (connection)
+            {
+                command = new SqlCommand(cmdString, connection);
+                connection.Open();
+                executeCount = command.ExecuteNonQuery();
+                connection.Close();
+                if (executeCount > 0)
+                       { return true; }
+                else
+                       { return false; }
+
+            }
+        }
+
+        private List<userInfo> SearchCmd(string cmdString)
+        {
+            using (command)
+            {
+                command = new SqlCommand(cmdString, connection);
+                connection.Open();
+                reader = command.ExecuteReader();
+
+                if (reader.HasRows)
+                {
+                    while (reader.Read())
+                    {
+                        userInfo GetUserInfo = ReaderInsertToList(reader);
+                        userInfos.Add(GetUserInfo);
+                    }
+                }
+                connection.Close();
+                reader.Close();
+                return userInfos;
+            }
+        }
+
+        private userInfo ReaderInsertToList(SqlDataReader reader)
+        {
+            userInfo GetUserInfo = new userInfo
+            {
+                uid = reader.GetString(reader.GetOrdinal("uid")),
+                uname = reader.GetString(reader.GetOrdinal("uname")),
+                password = reader.GetString(reader.GetOrdinal("password")),
+                phone = reader.GetString(reader.GetOrdinal("phone")),
+                role = reader.GetString(reader.GetOrdinal("role")),
+            };
+            return GetUserInfo;
+        }
+
+    }
+}
