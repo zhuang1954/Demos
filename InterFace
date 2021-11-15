@@ -1,0 +1,17 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Project1.Models.Repository
+{
+    interface IUserRepository
+    {
+        List<userInfo> GetUid(string uid);
+        List<userInfo> SearchUid(string uid);
+        List<userInfo> GetAll();
+        bool Regist(userInfo model);
+        bool Login(string uid, string password);
+    }
+}
