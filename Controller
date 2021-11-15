@@ -1,0 +1,72 @@
+using Project1.Models;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web.Mvc;
+using Project1.Models.Repository;
+
+namespace Project1.Controllers
+{
+    public class UserController : Controller
+    {
+        // GET: User
+        private userInfo _userInfo;
+        private IUserRepository  userRepository;
+        private bool success;
+         
+        public UserController()
+        {
+            _userInfo = new userInfo();
+            userRepository = new UserRepository ();
+        }
+
+        public ActionResult Index(string item)
+        {
+            if (!string.IsNullOrEmpty(item))
+            {
+                var SearchModel = userRepository.SearchUid(item);
+                return View(SearchModel);
+
+            }
+            var model = userRepository.GetAll();
+            return View(model);
+        }
+        public ActionResult Login()
+        {
+            return View(_userInfo);
+        }
+        [HttpPost]
+        public ActionResult Login(userInfo model)
+        {
+            bool islogin = userRepository.Login(model.uid,model.password);
+            if(islogin == true)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+            ModelState.AddModelError("", "帳號或密碼不正確");
+             return View(model);
+            
+        }
+
+     
+
+        public ActionResult Regist()
+        {
+            return View(_userInfo);
+        }
+        [HttpPost]
+        public ActionResult Regist(userInfo model)
+        {
+            success = userRepository.Regist(model);
+            if(success == true)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+            ModelState.AddModelError("", "已有相同帳號");
+            return View(model);
+        }
+
+     
+
+
+    }
+}
