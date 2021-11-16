@@ -26,7 +26,8 @@ namespace Project1.Models.Repository
         public List<userInfo> GetUid(string uid)
         {
             cmdString = String.Format("SELECT * FROM userInfo WHERE uid = '${0}';",uid);
-            return  SearchCmd(cmdString);
+
+               return  SearchCmd(cmdString);
          
         }
         public List<userInfo> SearchUid(string uid)
@@ -40,11 +41,28 @@ namespace Project1.Models.Repository
         public List<userInfo> GetAll()
         {
             cmdString = "SELECT * FROM userInfo";
-          　return  SearchCmd(cmdString);
+            return SearchCmd(cmdString);
         }
-       
-       
 
+
+        public bool Delete(string uid)
+        {
+            cmdString = String.Format("DELETE  FROM userInfo WHERE uid = '${0}';", uid);
+
+            using (connection)
+            {
+                command = new SqlCommand(cmdString, connection);
+                connection.Open();
+                executeCount = command.ExecuteNonQuery();
+                connection.Close();
+                if (executeCount > 0)
+                { return true; }
+                else
+                { return false; }
+
+            }
+
+        }
 
         public bool Login(string uid, string password)
         {
@@ -82,7 +100,31 @@ namespace Project1.Models.Repository
 
             }
         }
+        
 
+        public bool Update(userInfo model)
+        {
+            if (GetUid(model.uid) == null) { return false; }
+
+            cmdString = String.Format("UPDATE userInfo " +
+                "                      SET uid ='{0}',uname = '{1}',password= '{2},phone='{3}',role)={4}'" +
+                                      "WHERE uid = ${5};"
+                                     , model.uid, model.uname, model.password, model.phone, model.role,model.uid);
+            using (connection)
+            {
+                command = new SqlCommand(cmdString, connection);
+                connection.Open();
+                executeCount = command.ExecuteNonQuery();
+                connection.Close();
+                if (executeCount > 0)
+                { return true; }
+                else
+                { return false; }
+
+            }
+        }
+
+        
         private List<userInfo> SearchCmd(string cmdString)
         {
             using (command)
