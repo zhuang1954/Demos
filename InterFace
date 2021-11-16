@@ -11,7 +11,14 @@ namespace Project1.Models.Repository
         List<userInfo> GetUid(string uid);
         List<userInfo> SearchUid(string uid);
         List<userInfo> GetAll();
+        bool Delete(string uid);
+        bool Update(userInfo model);
         bool Regist(userInfo model);
         bool Login(string uid, string password);
+      
+
+
+
+
     }
 }
