@@ -62,9 +62,9 @@ namespace Project1.Controllers
             return View(model);
         }
 
-        public ActionResult Update(string uid)
+        public ActionResult Update(string id)
         {
-            var model = userRepository.GetUid(uid);
+            var model = userRepository.GetUid(id);
             return View(model);
         }
         [HttpPost]
@@ -79,10 +79,11 @@ namespace Project1.Controllers
             return View(model);
         }
 
+     
         [HttpPost]
-        public ActionResult Delete(string uid)
+        public ActionResult Delete(string id)
         {
-            success = userRepository.Delete(uid);
+            success = userRepository.Delete(id);
             if (success == true)
             {
                 return RedirectToAction("Index", "Home");
