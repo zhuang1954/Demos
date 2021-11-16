@@ -9,7 +9,7 @@ namespace Project1.Models.Repository
     public class UserRepository : IUserRepository
     {
         List<userInfo> userInfos = new List<userInfo>();
-
+        userInfo GetUserInfo;
         SqlConnection connection;
         SqlCommand command;
         SqlDataReader reader;
@@ -23,12 +23,29 @@ namespace Project1.Models.Repository
         }
 
 
-        public List<userInfo> GetUid(string uid)
+        public userInfo GetUid(string uid)
         {
-            cmdString = String.Format("SELECT * FROM userInfo WHERE uid = '${0}';",uid);
-
-               return  SearchCmd(cmdString);
          
+            cmdString = String.Format("SELECT * FROM userInfo WHERE uid = '{0}';",uid);
+            using (command)
+            {
+                command = new SqlCommand(cmdString, connection);
+                connection.Open();
+                reader = command.ExecuteReader();
+
+                if (reader.HasRows)
+                {
+                    while (reader.Read())
+                    {
+                      GetUserInfo = ReaderInsertToList(reader);
+                        return GetUserInfo;
+                    }
+
+                }
+                connection.Close();
+                reader.Close();
+            }
+            return GetUserInfo;
         }
         public List<userInfo> SearchUid(string uid)
         {
@@ -47,7 +64,7 @@ namespace Project1.Models.Repository
 
         public bool Delete(string uid)
         {
-            cmdString = String.Format("DELETE  FROM userInfo WHERE uid = '${0}';", uid);
+            cmdString = String.Format("DELETE  FROM userInfo WHERE uid = '{0}';", uid);
 
             using (connection)
             {
@@ -104,11 +121,11 @@ namespace Project1.Models.Repository
 
         public bool Update(userInfo model)
         {
-            if (GetUid(model.uid) == null) { return false; }
+            if (GetUid(model.uid) != null) { return false; }
 
             cmdString = String.Format("UPDATE userInfo " +
-                "                      SET uid ='{0}',uname = '{1}',password= '{2},phone='{3}',role)={4}'" +
-                                      "WHERE uid = ${5};"
+                "                      SET uid ='{0}',uname = '{1}',password= '{2}',phone='{3}',role='{4}'" +
+                                      " WHERE uid = '{5}';"
                                      , model.uid, model.uname, model.password, model.phone, model.role,model.uid);
             using (connection)
             {
