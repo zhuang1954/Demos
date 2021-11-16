@@ -46,9 +46,6 @@ namespace Project1.Controllers
              return View(model);
             
         }
-
-     
-
         public ActionResult Regist()
         {
             return View(_userInfo);
@@ -65,7 +62,36 @@ namespace Project1.Controllers
             return View(model);
         }
 
-     
+        public ActionResult Update(string uid)
+        {
+            var model = userRepository.GetUid(uid);
+            return View(model);
+        }
+        [HttpPost]
+        public ActionResult Update(userInfo model)
+        {
+            success = userRepository.Update(model);
+            if (success == true)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+            ModelState.AddModelError("", "已有相同帳號");
+            return View(model);
+        }
+
+        [HttpPost]
+        public ActionResult Delete(string uid)
+        {
+            success = userRepository.Delete(uid);
+            if (success == true)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+            ModelState.AddModelError("", "已有相同帳號");
+            return RedirectToAction("Index");
+        }
+
+
 
 
     }
