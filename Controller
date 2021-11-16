@@ -75,7 +75,6 @@ namespace Project1.Controllers
             {
                 return RedirectToAction("Index", "Home");
             }
-            ModelState.AddModelError("", "已有相同帳號");
             return View(model);
         }
 
@@ -88,7 +87,6 @@ namespace Project1.Controllers
             {
                 return RedirectToAction("Index", "Home");
             }
-            ModelState.AddModelError("", "已有相同帳號");
             return RedirectToAction("Index");
         }
 
